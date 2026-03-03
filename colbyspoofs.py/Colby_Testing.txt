@@ -1,1 +1,1 @@
-Hello from main!
+Hello from main! This is using the terminal.
