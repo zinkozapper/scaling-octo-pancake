@@ -1,4 +1,6 @@
 import random
+import mainsample
+import play_game
 
 # Daniel Walker, Colby Seeley, Adam Halliday
 # This is a group program that is designed to simulate a soccer season with randomly generated values
@@ -80,6 +82,8 @@ while True:
             temp_teams.remove(home_team)
             away_team = select_team(temp_teams, "opponent")
             temp_teams.remove(away_team)
+            print(play_game.play_game(home_team, away_team))
+            print(mainsample)
         else:
             print(
                 "\nThere are currently not enough teams available in the system to have a game.\nPlease ensure at least two teams are stored in the system.\n"
