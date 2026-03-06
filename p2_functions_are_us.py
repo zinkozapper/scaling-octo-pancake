@@ -1,5 +1,4 @@
 import random
-import mainsample
 import play_game
 
 # Daniel Walker, Colby Seeley, Adam Halliday
@@ -44,7 +43,7 @@ def print_teams(teams):
 
 
 # Function to select home team and opponent team
-def select_team(teams, team_type = "home"):
+def select_team(teams, team_type="home"):
     while True:
         print_teams(teams)
         team = input(f"\nPlease enter the {team_type} team from the list of teams: ")
@@ -58,6 +57,7 @@ def select_team(teams, team_type = "home"):
 
 # Main function with function calls
 teams = []
+game_results = {"won against": [], "lost against": []}
 name = introduction()
 while True:
     print_teams(teams)
@@ -65,16 +65,24 @@ while True:
     if menuSelection == 1:
         teams.append(input("\nPlease enter the team name: "))
     elif menuSelection == 2:
-        while True:
-            team_delete = input(
-                "\nPlease enter the name of the team you'd like to delete: "
+        if len(teams) < 1:
+            print(
+                "\nThere are currently no teams stored in the system for deletion. "
+                "Please ensure at least one team is stored in the system."
             )
-            if team_delete in teams:
-                print(f"The team {team_delete} has been removed from the system.")
-                teams.remove(team_delete)
-                break
-            else:
-                print("\nTeam not found. Please try again.")
+        else:
+            while True:
+                team_delete = input(
+                    "\nPlease enter the name of the team you'd like to delete (or 'exit' to exit function): "
+                )
+                if team_delete.lower() == "exit":
+                    break
+                elif team_delete in teams:
+                    print(f"The team {team_delete} has been removed from the system.")
+                    teams.remove(team_delete)
+                    break
+                else:
+                    print("\nTeam not found. Please try again.")
     elif menuSelection == 3:
         if len(teams) > 1:
             temp_teams = teams.copy()
@@ -82,8 +90,12 @@ while True:
             temp_teams.remove(home_team)
             away_team = select_team(temp_teams, "opponent")
             temp_teams.remove(away_team)
-            print(play_game.play_game(home_team, away_team))
-            print(mainsample)
+            home_game_result = play_game.play_game(home_team, away_team)
+            if home_game_result == "W":
+                game_results["won against"].append(away_team)
+            elif home_game_result == "L":
+                game_results["lost against"].append(away_team)
+            print(game_results)
         else:
             print(
                 "\nThere are currently not enough teams available in the system to have a game.\nPlease ensure at least two teams are stored in the system.\n"
