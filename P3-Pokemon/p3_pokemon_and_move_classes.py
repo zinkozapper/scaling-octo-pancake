@@ -56,7 +56,7 @@ moves = [
 
 # Loop that runs 3 times that randomly selects an object, obtains its info, and generates an attack value
 for iCount in range(0, 3):
-    random_key = random.randint(0, len(moves))
+    random_key = random.randint(0, len(moves)-1)
     move = moves[random_key]
     print(move.get_info())
     print(f"Generated attack value: {move.generate_attack_value()}")
@@ -69,17 +69,21 @@ while True:
         break
 
 
-# Initalizes each pokemon
+# Initalizes each pokemon and stores objects to list
 oPokemonBulbasuar = Pokemon("Bulbasuar", "Grass", 60)
 oPokemonCharmander = Pokemon("Charmander", "Fire", 55)
 oPokemonSquirtle = Pokemon("Squirtle", "Water", 65)
 
-# Gets all the pokemon info
-oPokemonBulbasuar.get_info()
-oPokemonCharmander.get_info()
-oPokemonSquirtle.get_info()
+list_pokemon = [
+    oPokemonBulbasuar,
+    oPokemonCharmander,
+    oPokemonSquirtle
+]
 
-# Heals each pokemon. This is mostly for example. Move or delete.
-oPokemonBulbasuar.heal()
+# Print charmander's info and heal
+oPokemonCharmander.get_info()
 oPokemonCharmander.heal()
-oPokemonSquirtle.heal()
+
+# Prints get_info for each pokemon
+for pokemon in list_pokemon:
+    pokemon.get_info()
