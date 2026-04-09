@@ -24,7 +24,7 @@ def database_init():
     return oDatabase
 
 
-def scrape_conference():
+def scrape_conference(db):
     # Code to scrape general conference data and return a dataframe
     # Get the relevant church website for October 2025 General Conference
     response = requests.get(
@@ -52,18 +52,239 @@ def scrape_conference():
                 full_url = base_url + relative_url
                 # Add full url to list of urls
                 talk_urls.append(full_url)
-        # Loop through URLs, access relevant information and perform processing
-        database_info = []
+        # Loop through URLs, access relevant information, perform processing, and return a dictionary for storage in the database.
         for url in talk_urls:
             Conference_Response = requests.get(url)
-            Conference_Response.encoding = 'utf-8'
+            Conference_Response.encoding = "utf-8"
             if Conference_Response.status_code == 200:
                 conference_soup = BeautifulSoup(Conference_Response.text, "html.parser")
-                ind_talk_items = conference_soup.find("h1")
-                clean_title = ind_talk_items.get_text(strip=True)
-                print(clean_title)
+                # Extract clean title and temporarily store it
+                title_talk_item = conference_soup.find("h1")
+                clean_title = title_talk_item.get_text(strip=True).replace("\xa0", " ")
+                # Extract speaker name and store it formatted correctly
+                name_talk_item = conference_soup.find(
+                    "p", attrs={"class": "author-name"}
+                )
+                clean_name = name_talk_item.get_text(strip=True)[3:].replace(
+                    "\xa0", " "
+                )
+                # Extract kicker and store it formatted correctly
+                kicker_talk_item = conference_soup.find("p", attrs={"class": "kicker"})
+                clean_kicker = kicker_talk_item.get_text(strip=True).replace(
+                    "\xa0", " "
+                )
+                # Extract the number of times each book of scripture is listed in the references
+                footnotes_section = conference_soup.find(
+                    "footer", attrs={"class": "notes"}
+                )
+                # Verify that footnotes are not empty before continuing further
+                if footnotes_section is not None:
+                    # Huge dictionary to add items to; DON'T DELETE THIS IS NEEDED FOR PROGRAM TO FUNCTION!!!
+                    standard_works_dict = {
+                        "Speaker_Name": "",
+                        "Talk_Name": "",
+                        "Kicker": "",
+                        "Matthew": 0,
+                        "Mark": 0,
+                        "Luke": 0,
+                        "John": 0,
+                        "Acts": 0,
+                        "Romans": 0,
+                        "1 Corinthians": 0,
+                        "2 Corinthians": 0,
+                        "Galatians": 0,
+                        "Ephesians": 0,
+                        "Philippians": 0,
+                        "Colossians": 0,
+                        "1 Thessalonians": 0,
+                        "2 Thessalonians": 0,
+                        "1 Timothy": 0,
+                        "2 Timothy": 0,
+                        "Titus": 0,
+                        "Philemon": 0,
+                        "Hebrews": 0,
+                        "James": 0,
+                        "1 Peter": 0,
+                        "2 Peter": 0,
+                        "1 John": 0,
+                        "2 John": 0,
+                        "3 John": 0,
+                        "Jude": 0,
+                        "Revelation": 0,
+                        "Genesis": 0,
+                        "Exodus": 0,
+                        "Leviticus": 0,
+                        "Numbers": 0,
+                        "Deuteronomy": 0,
+                        "Joshua": 0,
+                        "Judges": 0,
+                        "Ruth": 0,
+                        "1 Samuel": 0,
+                        "2 Samuel": 0,
+                        "1 Kings": 0,
+                        "2 Kings": 0,
+                        "1 Chronicles": 0,
+                        "2 Chronicles": 0,
+                        "Ezra": 0,
+                        "Nehemiah": 0,
+                        "Esther": 0,
+                        "Job": 0,
+                        "Psalm": 0,
+                        "Proverbs": 0,
+                        "Ecclesiastes": 0,
+                        "Song of Solomon": 0,
+                        "Isaiah": 0,
+                        "Jeremiah": 0,
+                        "Lamentations": 0,
+                        "Ezekiel": 0,
+                        "Daniel": 0,
+                        "Hosea": 0,
+                        "Joel": 0,
+                        "Amos": 0,
+                        "Obadiah": 0,
+                        "Jonah": 0,
+                        "Micah": 0,
+                        "Nahum": 0,
+                        "Habakkuk": 0,
+                        "Zephaniah": 0,
+                        "Haggai": 0,
+                        "Zechariah": 0,
+                        "Malachi": 0,
+                        "1 Nephi": 0,
+                        "2 Nephi": 0,
+                        "Jacob": 0,
+                        "Enos": 0,
+                        "Jarom": 0,
+                        "Omni": 0,
+                        "Words of Mormon": 0,
+                        "Mosiah": 0,
+                        "Alma": 0,
+                        "Helaman": 0,
+                        "3 Nephi": 0,
+                        "4 Nephi": 0,
+                        "Mormon": 0,
+                        "Ether": 0,
+                        "Moroni": 0,
+                        "Doctrine and Covenants": 0,
+                        "Moses": 0,
+                        "Abraham": 0,
+                        "Joseph Smith—Matthew": 0,
+                        "Joseph Smith—History": 0,
+                        "Articles of Faith": 0,
+                    }
+                    # Loop through dictionary
+                    footnotes_text = footnotes_section.get_text(strip=True).replace(
+                        "\xa0", " "
+                    )
+                    for dict_item in standard_works_dict:
+                        scripture_count = footnotes_text.count(dict_item)
+                        standard_works_dict[dict_item] = scripture_count
+                    standard_works_dict["Speaker_Name"] = clean_name
+                    standard_works_dict["Talk_Name"] = clean_title
+                    standard_works_dict["Kicker"] = clean_kicker
+                    # Transform to pandas dataframe and store in in a table called 'general_conference' in the is303 postgres database
+                    df = pd.DataFrame([standard_works_dict])
+                    db.insert_data(df)
+                else:
+                    standard_works_dict = {
+                        "Speaker_Name": clean_name,
+                        "Talk_Name": clean_title,
+                        "Kicker": clean_kicker,
+                        "Matthew": "N/A",
+                        "Mark": "N/A",
+                        "Luke": "N/A",
+                        "John": "N/A",
+                        "Acts": "N/A",
+                        "Romans": "N/A",
+                        "1 Corinthians": "N/A",
+                        "2 Corinthians": "N/A",
+                        "Galatians": "N/A",
+                        "Ephesians": "N/A",
+                        "Philippians": "N/A",
+                        "Colossians": "N/A",
+                        "1 Thessalonians": "N/A",
+                        "2 Thessalonians": "N/A",
+                        "1 Timothy": "N/A",
+                        "2 Timothy": "N/A",
+                        "Titus": "N/A",
+                        "Philemon": "N/A",
+                        "Hebrews": "N/A",
+                        "James": "N/A",
+                        "1 Peter": "N/A",
+                        "2 Peter": "N/A",
+                        "1 John": "N/A",
+                        "2 John": "N/A",
+                        "3 John": "N/A",
+                        "Jude": "N/A",
+                        "Revelation": "N/A",
+                        "Genesis": "N/A",
+                        "Exodus": "N/A",
+                        "Leviticus": "N/A",
+                        "Numbers": "N/A",
+                        "Deuteronomy": "N/A",
+                        "Joshua": "N/A",
+                        "Judges": "N/A",
+                        "Ruth": "N/A",
+                        "1 Samuel": "N/A",
+                        "2 Samuel": "N/A",
+                        "1 Kings": "N/A",
+                        "2 Kings": "N/A",
+                        "1 Chronicles": "N/A",
+                        "2 Chronicles": "N/A",
+                        "Ezra": "N/A",
+                        "Nehemiah": "N/A",
+                        "Esther": "N/A",
+                        "Job": "N/A",
+                        "Psalm": "N/A",
+                        "Proverbs": "N/A",
+                        "Ecclesiastes": "N/A",
+                        "Song of Solomon": "N/A",
+                        "Isaiah": "N/A",
+                        "Jeremiah": "N/A",
+                        "Lamentations": "N/A",
+                        "Ezekiel": "N/A",
+                        "Daniel": "N/A",
+                        "Hosea": "N/A",
+                        "Joel": "N/A",
+                        "Amos": "N/A",
+                        "Obadiah": "N/A",
+                        "Jonah": "N/A",
+                        "Micah": "N/A",
+                        "Nahum": "N/A",
+                        "Habakkuk": "N/A",
+                        "Zephaniah": "N/A",
+                        "Haggai": "N/A",
+                        "Zechariah": "N/A",
+                        "Malachi": "N/A",
+                        "1 Nephi": "N/A",
+                        "2 Nephi": "N/A",
+                        "Jacob": "N/A",
+                        "Enos": "N/A",
+                        "Jarom": "N/A",
+                        "Omni": "N/A",
+                        "Words of Mormon": "N/A",
+                        "Mosiah": "N/A",
+                        "Alma": "N/A",
+                        "Helaman": "N/A",
+                        "3 Nephi": "N/A",
+                        "4 Nephi": "N/A",
+                        "Mormon": "N/A",
+                        "Ether": "N/A",
+                        "Moroni": "N/A",
+                        "Doctrine and Covenants": "N/A",
+                        "Moses": "N/A",
+                        "Abraham": "N/A",
+                        "Joseph Smith—Matthew": "N/A",
+                        "Joseph Smith—History": "N/A",
+                        "Articles of Faith": "N/A",
+                    }
+                    df = pd.DataFrame([standard_works_dict])
+                    db.insert_data(df)
             else:
-                print(f"Failed to retrieve the page. Status code: {Conference_Response.status_code}")
+                print(
+                    f"Failed to retrieve the page. Status code: {Conference_Response.status_code}"
+                )
+        print("\nYou've saved the scraped data to your postgres database.")
     else:
         print(f"Failed to retrieve the page. Status code: {response.status_code}")
 
@@ -111,31 +332,8 @@ if __name__ == "__main__":
             "If you want to scrape data, enter 1. If you want to see summaries of stored data, enter 2. Enter any other value to exit the program: "
         )
         if iUserChoice == "1":
-            # Variables with information needed for database connection
-            db_user = "postgres"  # Your Postgres username (usually 'postgres')
-            db_password = (
-                "SchoolPaper2015"  # The password you use to log into pgAdmin/Postgres
-            )
-            db_host = "localhost"  # Usually 'localhost' if running on your own computer
-            db_port = "5432"  # The default Postgres port
-            db_name = "is303"  # The name of your database
-
-            # 2. Build the connection string (the URL that points to your database)
-            connection_string = (
-                f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-            )
-
-            # 3. Create the engine!
-            engine = sqlalchemy.create_engine(connection_string)
-            drop_table_query = sqlalchemy.text(
-                "DROP table if exists general_conference;"
-            )
-            conn = engine.connect()
-            conn.execute(drop_table_query)
-            conn.commit()
-            conn.close()
             # Perform the scraping process for general conference
-            scrape_conference()
+            scrape_conference(oDatabase)
             # To save to the database, call oDatabase.insert_data(dataframe). Use this to save one row at a time please :)
         elif iUserChoice == "2":
             view_data()
