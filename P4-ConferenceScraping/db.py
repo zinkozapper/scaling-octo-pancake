@@ -6,8 +6,9 @@ import pandas as pd
 
 
 class DatabaseManager:
-    def __init__(self, connection_string: str):
-        self.engine = sqlalchemy.create_engine(connection_string)
+    def __init__( self, db_password, db_user: str = "postgres", db_host: str = "localhost", db_port: int = 5432, db_name: str = "IS303" ):        
+        self.connection_string = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+        self.engine = sqlalchemy.create_engine(self.connection_string)
 
     def insert_data(self, dataframe: pd.DataFrame):
         dataframe.to_sql('general_conference', con=self.engine, if_exists='append', index=False)

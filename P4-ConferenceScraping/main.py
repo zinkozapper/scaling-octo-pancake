@@ -11,15 +11,19 @@ import db
 
 # This function is specifically because of permissions issues for the database (for Daniel lol).
 def database_init():
-    db_user = input("Enter Postgres Username (usually 'postgres'): ")
-    db_password = getpass("Enter Postgres Password: ")
-    db_host = "localhost"
-    db_port = "5432"
-    db_name = "is303"
-    oDatabase = db.DatabaseManager(
-        f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-    )
-    return oDatabase
+    raw_data = {
+        "db_user": input("Enter Postgres Username (default 'postgres'): "),
+        "db_host": input("Enter DB host (default 'localhost'): "),
+        "db_port": input("Enter the database port (i.e. 5432 or 5434, defaults to 5432): "),
+        "db_name": input("Enter the database name (default IS303): ")
+    }
+    
+    # Checks if the user put data into the input
+    clean_data = {k: v for k, v in raw_data.items() if v}
+    
+    # Require mandatory password
+    clean_data["db_password"] = getpass("Password: ")
+    return db.DatabaseManager(**clean_data)
 
 
 def scrape_conference(db):
