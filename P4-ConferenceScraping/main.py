@@ -26,16 +26,16 @@ def database_init():
 
 def scrape_conference(db):
     # Code to scrape general conference data and return a dataframe
-    # Get the relevant church website for October 2025 General Conference
+    # Send a GET request for the relevant church website for the October 2025 General Conference
     response = requests.get(
         "https://www.churchofjesuschrist.org/study/general-conference/2025/10?lang=eng"
     )
-    # Basically eliminate special character conversion problems with BeautifulSoup
+    # Eliminate special character conversion problems with BeautifulSoup by specifying the standardized encoding
     response.encoding = "utf-8"
-    # Check to make sure scrape request was successful
+    # Check to make sure scrape request was successful; print out error message if not successful
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
-        # Grab all <li> tags that are specifically categorized as talks - very nice of the church to categorize for us
+        # Grab all <li> tags that are specifically categorized as talks - very nice of the church to categorize these items for us
         talk_items = soup.find_all(
             "li", attrs={"data-content-type": "general-conference-talk"}
         )
@@ -52,23 +52,25 @@ def scrape_conference(db):
                 full_url = base_url + relative_url
                 # Add full url to list of urls
                 talk_urls.append(full_url)
-        # Loop through URLs, access relevant information, perform processing, and return a dictionary for storage in the database.
+        # Loop through URLs, access relevant information, perform processing, and modify values in a dictionary for conversion to DataFrame and subsequent storage in the database.
         for url in talk_urls:
             Conference_Response = requests.get(url)
+            # Once again, prevent issues with non-standard characters
             Conference_Response.encoding = "utf-8"
+            # Once again, check to make sure GET request is successful
             if Conference_Response.status_code == 200:
                 conference_soup = BeautifulSoup(Conference_Response.text, "html.parser")
                 # Extract clean title and temporarily store it
                 title_talk_item = conference_soup.find("h1")
                 clean_title = title_talk_item.get_text(strip=True).replace("\xa0", " ")
-                # Extract speaker name and store it formatted correctly
+                # Extract speaker name and temporarily store it formatted correctly
                 name_talk_item = conference_soup.find(
                     "p", attrs={"class": "author-name"}
                 )
                 clean_name = name_talk_item.get_text(strip=True)[3:].replace(
                     "\xa0", " "
                 )
-                # Extract kicker and store it formatted correctly
+                # Extract kicker and temporarily store it formatted correctly
                 kicker_talk_item = conference_soup.find("p", attrs={"class": "kicker"})
                 clean_kicker = kicker_talk_item.get_text(strip=True).replace(
                     "\xa0", " "
@@ -77,9 +79,9 @@ def scrape_conference(db):
                 footnotes_section = conference_soup.find(
                     "footer", attrs={"class": "notes"}
                 )
-                # Verify that footnotes are not empty before continuing further
+                # Verify that footnotes are not empty before continuing further; updates database with records saying "N/A" if they aren't present
                 if footnotes_section is not None:
-                    # Huge dictionary to add items to; DON'T DELETE THIS IS NEEDED FOR PROGRAM TO FUNCTION!!!
+                    # Huge dictionary to add items to; DON'T DELETE THIS; THIS IS NEEDED FOR PROGRAM TO FUNCTION AND WAS RECOMMENDED BY INSTRUCTIONS!!!
                     standard_works_dict = {
                         "Speaker_Name": "",
                         "Talk_Name": "",
@@ -172,20 +174,23 @@ def scrape_conference(db):
                         "Joseph Smith—History": 0,
                         "Articles of Faith": 0,
                     }
-                    # Loop through dictionary
+                    # Loops through dictionary and assigns relevant values; eliminates non-standard characters
                     footnotes_text = footnotes_section.get_text(strip=True).replace(
                         "\xa0", " "
                     )
+                    # Replace dictionary values with count
                     for dict_item in standard_works_dict:
                         scripture_count = footnotes_text.count(dict_item)
                         standard_works_dict[dict_item] = scripture_count
+                    # Update dictionary with name, title, kicker
                     standard_works_dict["Speaker_Name"] = clean_name
                     standard_works_dict["Talk_Name"] = clean_title
                     standard_works_dict["Kicker"] = clean_kicker
-                    # Transform to pandas dataframe and store in in a table called 'general_conference' in the is303 postgres database
+                    # Transform to pandas dataframe and store in in a table called 'general_conference' in the is303 PostgreSQL database
                     df = pd.DataFrame([standard_works_dict])
                     db.insert_data(df)
                 else:
+                    # Assigns "N/A" values along with the title, name, and kicker when footnotes aren't present
                     standard_works_dict = {
                         "Speaker_Name": clean_name,
                         "Talk_Name": clean_title,
@@ -278,14 +283,18 @@ def scrape_conference(db):
                         "Joseph Smith—History": "N/A",
                         "Articles of Faith": "N/A",
                     }
+                    # Convert to dataframe and store in PostgreSQL database
                     df = pd.DataFrame([standard_works_dict])
                     db.insert_data(df)
             else:
+                # Error code if GET request is unsuccessful
                 print(
                     f"Failed to retrieve the page. Status code: {Conference_Response.status_code}"
                 )
+        # Message to indicate that scraping/storage process is complete
         print("\nYou've saved the scraped data to your postgres database.")
     else:
+        # Error code if GET request is unsuccessful
         print(f"Failed to retrieve the page. Status code: {response.status_code}")
 
 
@@ -332,7 +341,7 @@ if __name__ == "__main__":
             "If you want to scrape data, enter 1. If you want to see summaries of stored data, enter 2. Enter any other value to exit the program: "
         )
         if iUserChoice == "1":
-            # Perform the scraping process for general conference
+            # Perform the scraping process for general conference; passes the Database as a parameter for storage
             scrape_conference(oDatabase)
             # To save to the database, call oDatabase.insert_data(dataframe). Use this to save one row at a time please :)
         elif iUserChoice == "2":
