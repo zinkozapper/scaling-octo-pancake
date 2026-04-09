@@ -73,7 +73,7 @@ def scrape_conference(db):
                 clean_kicker = kicker_talk_item.get_text(strip=True).replace(
                     "\xa0", " "
                 )
-                # Extract the number of times each book of scripture is listed in the references
+                # Extract footer information
                 footnotes_section = conference_soup.find(
                     "footer", attrs={"class": "notes"}
                 )
