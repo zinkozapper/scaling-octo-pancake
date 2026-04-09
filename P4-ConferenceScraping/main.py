@@ -7,8 +7,6 @@ import requests
 import pandas as pd
 import matplotlib.pyplot as plt
 import db
-import sqlalchemy
-import psycopg2
 
 
 # This function is specifically because of permissions issues for the database (for Daniel lol).
