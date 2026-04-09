@@ -23,7 +23,7 @@ def database_init():
 
 
 def scrape_conference(db):
-    # Code to scrape general conference data and return a dataframe
+    # Code to scrape general conference data and store data in PostgreSQL database
     # Send a GET request for the relevant church website for the October 2025 General Conference
     response = requests.get(
         "https://www.churchofjesuschrist.org/study/general-conference/2025/10?lang=eng"
