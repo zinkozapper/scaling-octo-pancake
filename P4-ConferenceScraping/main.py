@@ -192,98 +192,98 @@ def scrape_conference(db):
                     df = pd.DataFrame([standard_works_dict])
                     db.insert_data(df)
                 else:
-                    # Assigns "N/A" values along with the title, name, and kicker when footnotes aren't present
+                    # Assigns NaN values along with the title, name, and kicker when footnotes aren't present
                     standard_works_dict = {
                         "Speaker_Name": clean_name,
                         "Talk_Name": clean_title,
                         "Kicker": clean_kicker,
-                        "Matthew": "N/A",
-                        "Mark": "N/A",
-                        "Luke": "N/A",
-                        "John": "N/A",
-                        "Acts": "N/A",
-                        "Romans": "N/A",
-                        "1 Corinthians": "N/A",
-                        "2 Corinthians": "N/A",
-                        "Galatians": "N/A",
-                        "Ephesians": "N/A",
-                        "Philippians": "N/A",
-                        "Colossians": "N/A",
-                        "1 Thessalonians": "N/A",
-                        "2 Thessalonians": "N/A",
-                        "1 Timothy": "N/A",
-                        "2 Timothy": "N/A",
-                        "Titus": "N/A",
-                        "Philemon": "N/A",
-                        "Hebrews": "N/A",
-                        "James": "N/A",
-                        "1 Peter": "N/A",
-                        "2 Peter": "N/A",
-                        "1 John": "N/A",
-                        "2 John": "N/A",
-                        "3 John": "N/A",
-                        "Jude": "N/A",
-                        "Revelation": "N/A",
-                        "Genesis": "N/A",
-                        "Exodus": "N/A",
-                        "Leviticus": "N/A",
-                        "Numbers": "N/A",
-                        "Deuteronomy": "N/A",
-                        "Joshua": "N/A",
-                        "Judges": "N/A",
-                        "Ruth": "N/A",
-                        "1 Samuel": "N/A",
-                        "2 Samuel": "N/A",
-                        "1 Kings": "N/A",
-                        "2 Kings": "N/A",
-                        "1 Chronicles": "N/A",
-                        "2 Chronicles": "N/A",
-                        "Ezra": "N/A",
-                        "Nehemiah": "N/A",
-                        "Esther": "N/A",
-                        "Job": "N/A",
-                        "Psalm": "N/A",
-                        "Proverbs": "N/A",
-                        "Ecclesiastes": "N/A",
-                        "Song of Solomon": "N/A",
-                        "Isaiah": "N/A",
-                        "Jeremiah": "N/A",
-                        "Lamentations": "N/A",
-                        "Ezekiel": "N/A",
-                        "Daniel": "N/A",
-                        "Hosea": "N/A",
-                        "Joel": "N/A",
-                        "Amos": "N/A",
-                        "Obadiah": "N/A",
-                        "Jonah": "N/A",
-                        "Micah": "N/A",
-                        "Nahum": "N/A",
-                        "Habakkuk": "N/A",
-                        "Zephaniah": "N/A",
-                        "Haggai": "N/A",
-                        "Zechariah": "N/A",
-                        "Malachi": "N/A",
-                        "1 Nephi": "N/A",
-                        "2 Nephi": "N/A",
-                        "Jacob": "N/A",
-                        "Enos": "N/A",
-                        "Jarom": "N/A",
-                        "Omni": "N/A",
-                        "Words of Mormon": "N/A",
-                        "Mosiah": "N/A",
-                        "Alma": "N/A",
-                        "Helaman": "N/A",
-                        "3 Nephi": "N/A",
-                        "4 Nephi": "N/A",
-                        "Mormon": "N/A",
-                        "Ether": "N/A",
-                        "Moroni": "N/A",
-                        "Doctrine and Covenants": "N/A",
-                        "Moses": "N/A",
-                        "Abraham": "N/A",
-                        "Joseph Smith—Matthew": "N/A",
-                        "Joseph Smith—History": "N/A",
-                        "Articles of Faith": "N/A",
+                        "Matthew": float('nan'),
+                        "Mark": float('nan'),
+                        "Luke": float('nan'),
+                        "John": float('nan'),
+                        "Acts": float('nan'),
+                        "Romans": float('nan'),
+                        "1 Corinthians": float('nan'),
+                        "2 Corinthians": float('nan'),
+                        "Galatians": float('nan'),
+                        "Ephesians": float('nan'),
+                        "Philippians": float('nan'),
+                        "Colossians": float('nan'),
+                        "1 Thessalonians": float('nan'),
+                        "2 Thessalonians": float('nan'),
+                        "1 Timothy": float('nan'),
+                        "2 Timothy": float('nan'),
+                        "Titus": float('nan'),
+                        "Philemon": float('nan'),
+                        "Hebrews": float('nan'),
+                        "James": float('nan'),
+                        "1 Peter": float('nan'),
+                        "2 Peter": float('nan'),
+                        "1 John": float('nan'),
+                        "2 John": float('nan'),
+                        "3 John": float('nan'),
+                        "Jude": float('nan'),
+                        "Revelation": float('nan'),
+                        "Genesis": float('nan'),
+                        "Exodus": float('nan'),
+                        "Leviticus": float('nan'),
+                        "Numbers": float('nan'),
+                        "Deuteronomy": float('nan'),
+                        "Joshua": float('nan'),
+                        "Judges": float('nan'),
+                        "Ruth": float('nan'),
+                        "1 Samuel": float('nan'),
+                        "2 Samuel": float('nan'),
+                        "1 Kings": float('nan'),
+                        "2 Kings": float('nan'),
+                        "1 Chronicles": float('nan'),
+                        "2 Chronicles": float('nan'),
+                        "Ezra": float('nan'),
+                        "Nehemiah": float('nan'),
+                        "Esther": float('nan'),
+                        "Job": float('nan'),
+                        "Psalm": float('nan'),
+                        "Proverbs": float('nan'),
+                        "Ecclesiastes": float('nan'),
+                        "Song of Solomon": float('nan'),
+                        "Isaiah": float('nan'),
+                        "Jeremiah": float('nan'),
+                        "Lamentations": float('nan'),
+                        "Ezekiel": float('nan'),
+                        "Daniel": float('nan'),
+                        "Hosea": float('nan'),
+                        "Joel": float('nan'),
+                        "Amos": float('nan'),
+                        "Obadiah": float('nan'),
+                        "Jonah": float('nan'),
+                        "Micah": float('nan'),
+                        "Nahum": float('nan'),
+                        "Habakkuk": float('nan'),
+                        "Zephaniah": float('nan'),
+                        "Haggai": float('nan'),
+                        "Zechariah": float('nan'),
+                        "Malachi": float('nan'),
+                        "1 Nephi": float('nan'),
+                        "2 Nephi": float('nan'),
+                        "Jacob": float('nan'),
+                        "Enos": float('nan'),
+                        "Jarom": float('nan'),
+                        "Omni": float('nan'),
+                        "Words of Mormon": float('nan'),
+                        "Mosiah": float('nan'),
+                        "Alma": float('nan'),
+                        "Helaman": float('nan'),
+                        "3 Nephi": float('nan'),
+                        "4 Nephi": float('nan'),
+                        "Mormon": float('nan'),
+                        "Ether": float('nan'),
+                        "Moroni": float('nan'),
+                        "Doctrine and Covenants": float('nan'),
+                        "Moses": float('nan'),
+                        "Abraham": float('nan'),
+                        "Joseph Smith—Matthew": float('nan'),
+                        "Joseph Smith—History": float('nan'),
+                        "Articles of Faith": float('nan'),
                     }
                     # Convert to dataframe and store in PostgreSQL database
                     df = pd.DataFrame([standard_works_dict])
@@ -301,30 +301,24 @@ def scrape_conference(db):
 
 
 # View summaries of the data
-def view_data():
+def view_data(db):
     while True:
         iUserChoice = input(
             "\nYou selected to see summaries. Enter 1 to see a summary of all talks. Enter 2 to select a specific talk. Enter anything else to exit: "
         )
         if iUserChoice == "1":
             # Code to see summary of all talks
-            pass
+            db.get_all_talks()
         elif iUserChoice == "2":
             # Code to select a specific talk
-            print("\nThe following are the names of speakers and their talks: ")
-
-            print("\nPlease enter the number of the talk you want to see summarized: ")
-            while True:
-                try:
-                    iTalkChoice = int(input())
-                    # Code to show summary of selected talk
-
-                except ValueError:
-                    print("Invalid input. Please enter a number.")
-                except KeyError:
-                    print("Invalid talk number. Please enter a valid number.")
+           db.get_talk_by_id()
         else:
-            end_program()
+            #confirm user wants to exit
+            s_confirm = input("Are you sure you want to exit? (Y/N) ").strip().lower()
+            if s_confirm.startswith('y'):
+                end_program()
+            else:
+                print("Returning to selection menu.")
 
 
 def end_program():
@@ -347,6 +341,12 @@ if __name__ == "__main__":
             scrape_conference(oDatabase)
             # To save to the database, call oDatabase.insert_data(dataframe). Use this to save one row at a time please :)
         elif iUserChoice == "2":
-            view_data()
+            #take user input and print summary or individual graphs
+            view_data(oDatabase)
         else:
-            end_program()
+            #confirm user wants to exit
+            s_confirm = input("Are you sure you want to exit? (Y/N) ").strip().lower()
+            if s_confirm.startswith('y'):
+                end_program()
+            else:
+                print("Returning to selection menu.")
