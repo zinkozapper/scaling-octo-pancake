@@ -337,7 +337,8 @@ if __name__ == "__main__":
             "If you want to scrape data, enter 1. If you want to see summaries of stored data, enter 2. Enter any other value to exit the program: "
         )
         if iUserChoice == "1":
-            # Perform the scraping process for general conference; passes the Database as a parameter for storage
+            # Perform the scraping process for general conference; passes the Database as a parameter for storage and first drops the table if present already in database
+            oDatabase.drop_tables()
             scrape_conference(oDatabase)
             # To save to the database, call oDatabase.insert_data(dataframe). Use this to save one row at a time please :)
         elif iUserChoice == "2":

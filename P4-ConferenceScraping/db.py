@@ -43,7 +43,9 @@ class DatabaseManager:
 
         print("\nThe following are the names of speakers and their talks: ")
         print(". "*42)
-        print(pd.read_sql('SELECT "Speaker_Name", "Talk_Name" FROM general_conference', self.engine))
+        df_display = pd.read_sql('SELECT "Speaker_Name", "Talk_Name" FROM general_conference', self.engine)
+        df_display.index += 1  # Shifts the pandas index to start at 1
+        print(df_display)
         print(". "*42)
         print("Please enter the number (#) of the talk you want to see summarized: ")
 
@@ -52,16 +54,16 @@ class DatabaseManager:
         while True:
             try:
                 i_talk_choice = int(input())
-                if i_talk_choice >= 0 and i_talk_choice <= len(dict_talk_list)-1:
+                if i_talk_choice >= 1 and i_talk_choice <= len(dict_talk_list):
                     break
                 else:
-                    print(f"Input must be between 0 and {len(dict_talk_list)-1}.")
+                    print(f"Input must be between 1 and {len(dict_talk_list)}.")
             except ValueError:
                 print("Invalid input. Please enter a number.")
             except KeyError:
                 print("Invalid talk number. Please enter a valid number.")
         for talk in dict_talk_list:
-            if i_talk_choice == talk:
+            if (i_talk_choice - 1) == talk:
                 s_talk_name = dict_talk_list[talk]['Talk_Name']
                 df_choice = df_from_postgres.query(f"Talk_Name == '{s_talk_name}'")
                 df_numeric = df_choice.drop(['Speaker_Name', 'Talk_Name', 'Kicker'], axis=1).apply(pd.to_numeric, errors='coerce')
@@ -72,11 +74,14 @@ class DatabaseManager:
                     print(f"\n--> The talk '{s_talk_name}' has no scriptural references. No graph could be generated.")
                     return
                 df_sums_filtered.plot(kind='bar')
-                plot.title('Standard Works Referenced in General Conference')
+                plot.title(f'Standard Works Referenced in {s_talk_name}')
                 plot.xlabel('Standard Works Books')
                 plot.ylabel('# Times Referenced')
                 plot.show()
                 return
 
     def drop_tables(self):
-        self.engine.connect().execute(sqlalchemy.text("DROP TABLE IF EXISTS general_conference"))
+        with self.engine.connect() as connection: 
+            connection.execute(sqlalchemy.text("DROP TABLE IF EXISTS general_conference"))
+    
+            connection.commit()
